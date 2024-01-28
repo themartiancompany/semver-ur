@@ -1,4 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0
+#
 # Maintainer: Felix Yan <felixonmars@archlinux.org>
+# Maintainer: Truocolo <truocolo@aol.com>
+# Maintainer: Pellegrino Prevete (tallero) <pellegrinoprevete@gmail.com>
 
 pkgname=semver
 pkgver=7.5.4
@@ -18,12 +22,25 @@ package() {
 
   # Non-deterministic race in npm gives 777 permissions to random directories.
   # See https://github.com/npm/npm/issues/9359 for details.
-  chmod -R u=rwX,go=rX "$pkgdir"
+  chmod \
+    -R \
+      u=rwX,go=rX \
+    "${pkgdir}/"* || \
+    true
 
   # npm installs package.json owned by build user
   # https://bugs.archlinux.org/task/63396
-  chown -R root:root "$pkgdir"
-
-  install -d "$pkgdir"/usr/share/licenses/$pkgname
-  ln -s ../../../lib/node_modules/$pkgname/LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+  chown \
+    -R \
+      0:0 \
+    "${pkgdir}/"* || \
+    true
+  install \
+    -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  ln \
+    -s \
+    ../../../lib/node_modules/$pkgname/LICENSE \
+    "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
 }
+
+# vim:set sw=2 sts=-1 et:
